@@ -1,0 +1,36 @@
+---
+nextcloud_linux_user: www-data
+nextcloud_opt_url: https://download.nextcloud.com/server/releases/latest.zip
+nextcloud_opt_dst: /var/www/nextcloud
+nextcloud_apt_install:
+# setup
+- unzip
+# nextcloud
+- libnextcloud2-mod-php
+# redis
+# php-redis
+# redis-server
+nextcloud_config_template:
+nextcloud_config_vars:
+  datadirectory: "{{ nextcloud_opt_dst }}"
+  mail_smtpname: support@unonweb.de
+nextcloud_db_name: nextcloud
+nextcloud_db_user: admin
+nextcloud_db_pw:
+nextcloud_admin_user:
+nextcloud_admin_pw:
+# systemd
+nextcloud_systemd_copy: []
+nextcloud_systemd_template:
+- nextcloud-cron.timer
+- nextcloud-cron.service
+nextcloud_systemd_enable:
+- nextcloud-cron.timer
+nextcloud_systemd_disable: []
+nextcloud_systemd_start:
+- nextcloud-cron.timer
+nextcloud_systemd_stop: []
+nextcloud_systemd_overrides: []
+nextcloud_systemd_reset: []
+nextcloud_systemd_mask: []
+nextcloud_systemd_unmask: []

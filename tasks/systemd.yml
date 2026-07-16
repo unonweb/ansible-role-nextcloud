@@ -1,0 +1,124 @@
+---
+# copy
+- when: nextcloud_systemd_copy | length > 0
+  name: Copy system unit files {{ nextcloud_systemd_copy }}
+  become: true
+  notify: systemctl --system daemon-reload
+  loop: "{{ nextcloud_systemd_copy }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+# template
+- when: nextcloud_systemd_template | length > 0
+  name: Template system unit files {{ nextcloud_systemd_template }}
+  become: true
+  notify: systemctl --system daemon-reload
+  loop: "{{ nextcloud_systemd_template }}"
+  ansible.builtin.template:
+    src: "{{ item }}" # -> my-unit.service.j2
+    dest: "/etc/systemd/system/{{ item.replace('.j2', '') }}" # un.machines.service.j2 -> systemd/un.machines.service
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+# reset
+- when: nextcloud_systemd_reset | length > 0
+  name: Reset system unit overrides {{ nextcloud_systemd_reset }}
+  loop: "{{ nextcloud_systemd_reset }}" # -> NetworkManager.service
+  become: true
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.d"
+    state: absent
+
+# overrides
+# -> NetworkManager.service.d/override.conf
+- when: nextcloud_systemd_overrides | length > 0
+  block:
+
+  # mkdir overrides
+  - name: Mkdir in /etc/systemd/system/...
+    become: true
+    loop: "{{ nextcloud_systemd_overrides }}"
+    ansible.builtin.file:
+      path: "/etc/systemd/system/{{ item | dirname }}"
+      state: directory
+      owner: root
+      group: root
+      mode: u=rwx,g=rx,o=rx
+
+  # cp overrides
+  - name: Copy system unit overrides {{ nextcloud_systemd_overrides }}
+    become: true
+    notify: systemctl --system daemon-reload
+    loop: "{{ nextcloud_systemd_overrides }}"
+    ansible.builtin.copy:
+      src: "{{ item }}"
+      dest: "/etc/systemd/system/{{ item }}"
+      force: true
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+
+# enable
+- when: nextcloud_systemd_enable | length > 0
+  name: systemctl --system enable {{ nextcloud_systemd_enable }}
+  become: true
+  loop: "{{ nextcloud_systemd_enable }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    enabled: true
+    name: "{{ item }}"
+
+# disable
+- when: nextcloud_systemd_disable | length > 0
+  name: systemctl --system disable {{ nextcloud_systemd_disable }}
+  become: true
+  loop: "{{ nextcloud_systemd_disable }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    enabled: false
+    name: "{{ item }}"
+
+# start
+- when: nextcloud_systemd_start | length > 0
+  name: systemctl --system start {{ nextcloud_systemd_start }}
+  become: true
+  loop: "{{ nextcloud_systemd_start }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    state: started
+    name: "{{ item }}"
+
+# stop
+- when: nextcloud_systemd_stop | length > 0
+  name: systemctl --system stop {{ nextcloud_systemd_stop }}
+  become: true
+  loop: "{{ nextcloud_systemd_stop }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    state: stopped
+    name: "{{ item }}"
+
+# mask
+- when: nextcloud_systemd_mask | length > 0
+  name: systemctl --system mask {{ nextcloud_systemd_mask }}
+  become: true
+  loop: "{{ nextcloud_systemd_mask }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    masked: true
+    name: "{{ item }}"
+
+# unmask
+- when: nextcloud_systemd_unmask | length > 0
+  name: systemctl --system unmask {{ nextcloud_systemd_unmask }}
+  become: true
+  loop: "{{ nextcloud_systemd_unmask }}"
+  ansible.builtin.systemd_service:
+    scope: system
+    masked: false
+    name: "{{ item }}"
