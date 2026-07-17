@@ -1,8 +1,10 @@
 ---
+# INSTALL
+# =======
 nextcloud_linux_user: www-data
-nextcloud_opt_url: https://download.nextcloud.com/server/releases/latest.zip
-nextcloud_opt_dst: /var/www/nextcloud
-nextcloud_apt_install:
+nextcloud_install_opt_url: https://download.nextcloud.com/server/releases/latest.zip
+nextcloud_install_opt_dst: /var/www/nextcloud
+nextcloud_install_apt:
 # setup
 - unzip
 # nextcloud
@@ -10,16 +12,27 @@ nextcloud_apt_install:
 # redis
 # php-redis
 # redis-server
-nextcloud_config_template:
-nextcloud_config_vars:
-  datadirectory: "{{ nextcloud_opt_dst }}"
-  mail_smtpname: support@unonweb.de
+
+# CONFIG
+# ======
+nextcloud_config_vars: []
+# - { key: 'example', value: 'example' }
+# - { key: 'example', value: 'example' }
+# use single quotes to make sure that YAML treats special chars literally
+
+# DB
+# ==
 nextcloud_db_name: nextcloud
 nextcloud_db_user: admin
 nextcloud_db_pw:
+
+# USER
+# ====
 nextcloud_admin_user:
 nextcloud_admin_pw:
-# systemd
+
+# SYSTEMD
+# =======
 nextcloud_systemd_copy: []
 nextcloud_systemd_template:
 - nextcloud-cron.timer

@@ -3,6 +3,6 @@ Description=Nextcloud cron.php job
 
 [Service]
 User={{ nextcloud_linux_user }}
-ExecCondition=php -f {{ nextcloud_opt_dst }}/occ status -e
-ExecStart=/usr/bin/php -f {{ nextcloud_opt_dst }}/cron.php
+ExecCondition=php -f {{ nextcloud_install_opt_dst }}/occ status -e
+ExecStart=/usr/bin/php -f {{ nextcloud_install_opt_dst }}/cron.php
 KillMode=process
