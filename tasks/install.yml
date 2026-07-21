@@ -1,0 +1,68 @@
+---
+# absent
+- when: nextcloud_install_state == "absent" or nextcloud_install_state == "reinstall"
+  name: Remove {{ nextcloud_install_opt_dst }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ nextcloud_install_opt_dst }}"
+    state: absent
+
+# present | reinstall
+- when: nextcloud_install_state == "present" or nextcloud_install_state == "reinstall"
+  block:
+
+  # mkdir
+  - name: Mkdir {{ nextcloud_install_opt_dst }}
+    become: true
+    ansible.builtin.file:
+      path: "{{ nextcloud_install_opt_dst }}"
+      state: directory
+      owner: "{{ nextcloud_linux_user }}"
+      group: "{{ nextcloud_linux_user }}"
+      mode: '0755'
+
+  # download
+  - name: Download the latest Nextcloud zip archive
+    become: true
+    ansible.builtin.get_url:
+      url: "{{ nextcloud_install_opt_url }}"
+      dest: /tmp/nextcloud-latest.zip
+      mode: '0644'
+
+  # unzip
+  - name: Unzip Nextcloud archive
+    become: true
+    ansible.builtin.unarchive:
+      src: /tmp/nextcloud-latest.zip
+      dest: "{{ nextcloud_install_opt_dst | dirname }}"
+      remote_src: true
+      owner: "{{ nextcloud_linux_user }}"
+      group: "{{ nextcloud_linux_user }}"
+      creates: "{{ nextcloud_install_opt_dst }}/config/config.php"
+      
+  # check
+  - name: Check if Nextcloud is already installed
+    become: true
+    ansible.builtin.stat:
+      path: "{{ nextcloud_install_opt_dst }}/config/config.php"
+    register: __nextcloud_config_file
+
+  # install
+  - when: __nextcloud_config_file.stat.exists == false
+    name: Run Nextcloud installation via occ command
+    become: true
+    become_user: "{{ nextcloud_linux_user }}"
+    environment:
+      ansible_remote_tmp: /tmp
+    no_log: false
+    args:
+      chdir: "{{ nextcloud_install_opt_dst }}"
+    ansible.builtin.command:
+      cmd: >
+        php occ maintenance:install
+        --database='mysql'
+        --database-name="{{ nextcloud_db_name }}"
+        --database-user="{{ nextcloud_db_user }}"
+        --database-pass="{{ nextcloud_db_pw }}"
+        --admin-user="{{ nextcloud_admin_user }}"
+        --admin-pass="{{ nextcloud_admin_pw }}"

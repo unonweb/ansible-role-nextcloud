@@ -4,21 +4,11 @@
 nextcloud_linux_user: www-data
 nextcloud_install_opt_url: https://download.nextcloud.com/server/releases/latest.zip
 nextcloud_install_opt_dst: /var/www/nextcloud
-nextcloud_install_apt:
-# setup
-- unzip
-# nextcloud
-- libnextcloud2-mod-php
-# redis
-# php-redis
-# redis-server
+nextcloud_install_state: present
 
 # CONFIG
 # ======
-nextcloud_config_vars: []
-# - { key: 'example', value: 'example' }
-# - { key: 'example', value: 'example' }
-# use single quotes to make sure that YAML treats special chars literally
+nextcloud_config_overrides: []
 
 # DB
 # ==

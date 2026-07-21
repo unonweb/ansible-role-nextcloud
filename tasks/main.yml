@@ -11,84 +11,37 @@
       - nextcloud_db_pw != None
       - nextcloud_admin_user != None
       - nextcloud_admin_pw != None
-      - nextcloud_config_template != None
+      - nextcloud_config_vars | length > 0
+      - nextcloud_install_opt_dst != None
+      - nextcloud_linux_user != None
+
+  # check required packages
+  - name: Check required packages
+    ansible.builtin.package:
+      state: present
+      name:
+      - php
+    check_mode: true
 
   # apt
-  - name: Apt install {{ nextcloud_install_apt }}
+  - name: Apt install unzip sudo
     become: true
     ansible.builtin.package:
-      name: "{{ nextcloud_install_apt }}"
       state: present
-
-  # download
-  - name: Download the latest Nextcloud zip archive
-    become: true
-    ansible.builtin.get_url:
-      url: "{{ nextcloud_install_opt_url }}"
-      dest: /tmp/nextcloud-latest.zip
-      mode: '0644'
-
-  # mkdir
-  - name: Mkdir {{ nextcloud_install_opt_dst }}
-    become: true
-    ansible.builtin.file:
-      path: "{{ nextcloud_install_opt_dst }}"
-      state: directory
-      owner: "{{ nextcloud_linux_user }}"
-      group: "{{ nextcloud_linux_user }}"
-      mode: '0755'
-
-  # unzip
-  - name: Unzip Nextcloud archive
-    become: true
-    ansible.builtin.unarchive:
-      src: /tmp/nextcloud-latest.zip
-      dest: "{{ nextcloud_install_opt_dst | dirname }}"
-      remote_src: true
-      owner: "{{ nextcloud_linux_user }}"
-      group: "{{ nextcloud_linux_user }}"
-      creates: "{{ nextcloud_install_opt_dst | }}/config/config.php"
-
-  # check
-  - name: Check if Nextcloud is already installed
-    become: true
-    ansible.builtin.stat:
-      path: "{{ nextcloud_install_opt_dst }}/config/config.php"
-    register: __nextcloud_config_file
+      name:
+      - unzip
+      - sudo
 
   # install
-  - when: __nextcloud_config_file.stat.exists == false
-    name: Run Nextcloud installation via occ command
-    become: true
-    become_user: "{{ nextcloud_linux_user }}"
-    no_log: true
-    args:
-      chdir: "{{ nextcloud_install_opt_dst }}"
-    ansible.builtin.command:
-      cmd: >
-        php occ maintenance:install
-        --database='mysql'
-        --database-name="{{ nextcloud_db_name }}"
-        --database-user="{{ nextcloud_db_user }}"
-        --database-pass="{{ nextcloud_db_pw }}"
-        --admin-user="{{ nextcloud_admin_user }}"
-        --admin-pass="{{ nextcloud_admin_pw }}"
+  - ansible.builtin.import_tasks: install.yml
 
-  - name: Config via OCC
-    become: true
-    become_user: "{{ nextcloud_linux_user }}"
-    args:
-      chdir: "{{ nextcloud_install_opt_dst }}"
-    ansible.builtin.command: >
-      php occ config:system:set {{ item.key }}
-      {% if item.type is defined %}--type={{ item.type }}{% endif %}
-      {% if item.value is string or item.value is number %}
-      --value="{{ item.value }}"
-      {% else %}
-      {% for val in item.value %}
-      --value="{{ val }}"
-      {% endfor %}
-      {% endif %}
-    loop: "{{  }}"
-    # Optional: Optimize execution by registering changes or running conditionally
-    changed_when: true
+  # config
+  - when: nextcloud_config_overrides | length > 0
+    tags: [nextcloud-config]
+    name: Template config overrides to {{ nextcloud_install_opt_dst }}/config/ansible_overrides.config.php
+    ansible.builtin.template:
+      src: ansible_overrides.config.php.j2
+      dest: "{{ nextcloud_install_opt_dst }}/config/ansible_overrides.config.php"
+      owner: "{{ nextcloud_linux_user }}"
+      group: "{{ nextcloud_linux_user }}"
+      mode: '0640'
