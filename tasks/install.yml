@@ -1,6 +1,6 @@
 ---
 # absent
-- when: nextcloud_install_state == "absent" or nextcloud_install_state == "reinstall"
+- when: nextcloud_install_state == "absent"
   name: Remove {{ nextcloud_install_opt_dst }}
   become: true
   ansible.builtin.file:
@@ -8,7 +8,7 @@
     state: absent
 
 # present | reinstall
-- when: nextcloud_install_state == "present" or nextcloud_install_state == "reinstall"
+- when: nextcloud_install_state == "present"
   block:
 
   # mkdir
