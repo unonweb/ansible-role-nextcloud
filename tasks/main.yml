@@ -11,7 +11,7 @@
       - nextcloud_db_pw != None
       - nextcloud_admin_user != None
       - nextcloud_admin_pw != None
-      - nextcloud_config_vars | length > 0
+      - nextcloud_config_overrides != None
       - nextcloud_install_opt_dst != None
       - nextcloud_linux_user != None
 
