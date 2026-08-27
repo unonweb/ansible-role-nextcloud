@@ -1,7 +1,6 @@
 ---
 - name: nextcloud role
-  tags:
-    - nextcloud
+  tags: [nextcloud, nextcloud-server]
   block:
 
   # assert
