@@ -9,6 +9,7 @@ nextcloud_install_state: present
 # CONFIG
 # ======
 nextcloud_config_overrides: []
+nextcloud_data_dir: /var/www/nextcloud/data
 
 # DB
 # ==
