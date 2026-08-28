@@ -4,10 +4,10 @@
     
   # absent
   - when: nextcloud_install_state == "absent"
-    name: Remove {{ nextcloud_install_opt_dst }}
+    name: Remove {{ nextcloud_app_dir }}
     become: true
     ansible.builtin.file:
-      path: "{{ nextcloud_install_opt_dst }}"
+      path: "{{ nextcloud_app_dir }}"
       state: absent
 
   # present | reinstall
@@ -15,10 +15,10 @@
     block:
 
     # mkdir
-    - name: Mkdir {{ nextcloud_install_opt_dst }}
+    - name: Mkdir {{ nextcloud_app_dir }}
       become: true
       ansible.builtin.file:
-        path: "{{ nextcloud_install_opt_dst }}"
+        path: "{{ nextcloud_app_dir }}"
         state: directory
         owner: "{{ nextcloud_linux_user }}"
         group: "{{ nextcloud_linux_user }}"
@@ -33,25 +33,27 @@
         mode: '0644'
 
     # unzip
+    # extract only, will overwrite core files but not data
     - name: Unzip Nextcloud archive
       become: true
       ansible.builtin.unarchive:
         src: /tmp/nextcloud-latest.zip
-        dest: "{{ nextcloud_install_opt_dst | dirname }}"
+        dest: "{{ nextcloud_app_dir | dirname }}"
         remote_src: true
         owner: "{{ nextcloud_linux_user }}"
         group: "{{ nextcloud_linux_user }}"
-        creates: "{{ nextcloud_install_opt_dst }}/config/config.php"
+        creates: "{{ nextcloud_app_dir }}/config/config.php"
         
     # check
     - name: Check if Nextcloud is already installed
       become: true
       ansible.builtin.stat:
-        path: "{{ nextcloud_install_opt_dst }}/config/config.php"
+        path: "{{ nextcloud_app_dir }}/config/config.php"
       register: __nextcloud_config_file
 
     # install
     # required to initialize the database
+    # first time only
     - when: __nextcloud_config_file.stat.exists == false
       name: Run Nextcloud installation via occ command
       become: true
@@ -60,7 +62,7 @@
         ansible_remote_tmp: /tmp
       no_log: false
       args:
-        chdir: "{{ nextcloud_install_opt_dst }}"
+        chdir: "{{ nextcloud_app_dir }}"
       ansible.builtin.command:
         cmd: >
           php occ maintenance:install

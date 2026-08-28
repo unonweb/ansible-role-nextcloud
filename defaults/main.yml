@@ -3,12 +3,15 @@
 # =======
 nextcloud_linux_user: www-data
 nextcloud_install_opt_url: https://download.nextcloud.com/server/releases/latest.zip
-nextcloud_install_opt_dst: /var/www/nextcloud
 nextcloud_install_state: present
 
 # CONFIG
 # ======
 nextcloud_config_overrides: []
+
+# DIRS
+# ====
+nextcloud_app_dir: /var/www/nextcloud
 nextcloud_data_dir: /var/www/nextcloud/data
 
 # DB
