@@ -51,6 +51,7 @@
       register: __nextcloud_config_file
 
     # install
+    # required to initialize the database
     - when: __nextcloud_config_file.stat.exists == false
       name: Run Nextcloud installation via occ command
       become: true
@@ -67,5 +68,6 @@
           --database-name="{{ nextcloud_db_name }}"
           --database-user="{{ nextcloud_db_user }}"
           --database-pass="{{ nextcloud_db_pw }}"
+          --data-dir="{{ nextcloud_data_dir }}"
           --admin-user="{{ nextcloud_admin_user }}"
           --admin-pass="{{ nextcloud_admin_pw }}"
