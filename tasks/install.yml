@@ -43,33 +43,3 @@
         owner: "{{ nextcloud_linux_user }}"
         group: "{{ nextcloud_linux_user }}"
         creates: "{{ nextcloud_app_dir }}/config/config.php"
-        
-    # check
-    - name: Check if Nextcloud is already installed
-      become: true
-      ansible.builtin.stat:
-        path: "{{ nextcloud_app_dir }}/config/config.php"
-      register: __nextcloud_config_file
-
-    # install
-    # required to initialize the database
-    # first time only
-    - when: __nextcloud_config_file.stat.exists == false
-      name: Run Nextcloud installation via occ command
-      become: true
-      become_user: "{{ nextcloud_linux_user }}"
-      environment:
-        ansible_remote_tmp: /tmp
-      no_log: false
-      args:
-        chdir: "{{ nextcloud_app_dir }}"
-      ansible.builtin.command:
-        cmd: >
-          php occ maintenance:install
-          --database='mysql'
-          --database-name="{{ nextcloud_db_name }}"
-          --database-user="{{ nextcloud_db_user }}"
-          --database-pass="{{ nextcloud_db_pw }}"
-          --data-dir="{{ nextcloud_data_dir }}"
-          --admin-user="{{ nextcloud_admin_user }}"
-          --admin-pass="{{ nextcloud_admin_pw }}"
