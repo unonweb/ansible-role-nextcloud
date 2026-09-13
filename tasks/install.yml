@@ -14,6 +14,23 @@
   - when: nextcloud_install_state == "present"
     block:
 
+    # check required packages
+    - name: Check required packages
+      ansible.builtin.package:
+        state: present
+        name:
+        - php
+      check_mode: true
+
+    # apt
+    - name: Apt install unzip sudo
+      become: true
+      ansible.builtin.package:
+        state: present
+        name:
+        - unzip
+        - sudo
+
     # mkdir
     - name: Mkdir {{ nextcloud_app_dir }}
       become: true

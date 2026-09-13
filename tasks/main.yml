@@ -15,36 +15,11 @@
       - nextcloud_config_overrides != None
       - nextcloud_linux_user != None
 
-  # check required packages
-  - name: Check required packages
-    ansible.builtin.package:
-      state: present
-      name:
-      - php
-    check_mode: true
-
-  # apt
-  - name: Apt install unzip sudo
-    become: true
-    ansible.builtin.package:
-      state: present
-      name:
-      - unzip
-      - sudo
-
   # install
   - ansible.builtin.import_tasks: install.yml
 
-  # ini
+  # init
   - ansible.builtin.import_tasks: init.yml
 
   # config
-  - when: nextcloud_config_overrides | length > 0
-    tags: [nextcloud-config]
-    name: Template config overrides to {{ nextcloud_app_dir }}/config/ansible_overrides.config.php
-    ansible.builtin.template:
-      src: ansible_overrides.config.php.j2
-      dest: "{{ nextcloud_app_dir }}/config/ansible_overrides.config.php"
-      owner: "{{ nextcloud_linux_user }}"
-      group: "{{ nextcloud_linux_user }}"
-      mode: '0640'
+  - ansible.builtin.import_tasks: config.yml
