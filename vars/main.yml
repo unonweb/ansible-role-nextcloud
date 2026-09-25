@@ -1,2 +1,3 @@
 ---
-__nextcloud_install_opt_url: https://download.nextcloud.com/server/releases/latest.zip
+__nextcloud_install_opt_url: "{{ 'https://download.nextcloud.com/server/releases/latest.zip' if nextcloud_install_version == 'latest' else 'https://download.nextcloud.com/server/releases/nextcloud-' ~ nextcloud_install_version ~ '.zip'}}"
+__nextcloud_install_api_url: https://updates.nextcloud.com/updater_server/latest

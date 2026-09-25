@@ -3,26 +3,14 @@
   tags: [role-nextcloud]
   block:
 
-  # assert
-  - name: Assertions for nextcloud role
-    ansible.builtin.assert:
-      that:
-      - nextcloud_app_dir != None
-      - nextcloud_data_dir != None
-      - nextcloud_db_pw != None
-      - nextcloud_admin_user != None
-      - nextcloud_admin_pw != None
-      - nextcloud_config_overrides != None
-      - nextcloud_linux_user != None
-
   # install
-  - ansible.builtin.import_tasks: nextcloud-install.yml
+  - ansible.builtin.import_tasks: subtasks/nextcloud-install.yml
 
   # init
-  - ansible.builtin.import_tasks: nextcloud-init.yml
+  - ansible.builtin.import_tasks: subtasks/nextcloud-init.yml
 
   # config
-  - ansible.builtin.import_tasks: nextcloud-config.yml
+  - ansible.builtin.import_tasks: subtasks/nextcloud-config-overrides.yml
 
   # systemd
-  - ansible.builtin.import_tasks: nextcloud-systemd.yml
+  - ansible.builtin.import_tasks: subtasks/nextcloud-systemd.yml

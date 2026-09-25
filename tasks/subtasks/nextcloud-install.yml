@@ -72,4 +72,4 @@
         remote_src: true
         owner: "{{ nextcloud_linux_user }}"
         group: "{{ nextcloud_linux_user }}"
-        creates: "{{ nextcloud_app_dir }}/config/config.php"
+        creates: "{{ nextcloud_app_dir }}/config/config.php" # don't do it if this file already exists

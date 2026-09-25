@@ -1,0 +1,10 @@
+---
+- name: nextcloud role
+  tags: [role-nextcloud-restore]
+  block:
+
+  # install
+  - ansible.builtin.import_tasks: subtasks/nextcloud-install.yml
+
+  # config
+  - ansible.builtin.import_tasks: subtasks/nextcloud-config-restore.yml

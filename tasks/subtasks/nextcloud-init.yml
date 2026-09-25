@@ -1,7 +1,18 @@
 ---
 - tags: [role-nextcloud-init]
   block:
-    
+
+  # assert
+  - name: Assertions for nextcloud-init
+    ansible.builtin.assert:
+      that:
+      - nextcloud_app_dir != None
+      - nextcloud_data_dir != None
+      - nextcloud_db_pw != None
+      - nextcloud_admin_user != None
+      - nextcloud_admin_pw != None
+      - nextcloud_linux_user != None
+
   # check
   - name: Check if Nextcloud is already installed
     become: true

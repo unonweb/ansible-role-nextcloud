@@ -3,10 +3,12 @@
 # =======
 nextcloud_linux_user: www-data
 nextcloud_install_state: present
+nextcloud_install_version: latest # 33.0.5
 
 # CONFIG
 # ======
-nextcloud_config_overrides: []
+nextcloud_config_overrides: {}
+nextcloud_config_vars: {}
 
 # DIRS
 # ====

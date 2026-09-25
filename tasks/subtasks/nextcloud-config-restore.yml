@@ -1,0 +1,51 @@
+---
+- tags: [role-nextcloud-restore]
+  when: nextcloud_config_vars | length > 0
+  block:
+
+  - name: Assertions for nextcloud-restore
+    ansible.builtin.assert:
+      that:
+      # --- Restoration & Installation Flags ---
+      - nextcloud_config_vars['installed'] is defined
+      - nextcloud_config_vars['installed'] is sameas true
+      
+      # -- Data from previous installation ---
+      - nextcloud_config_vars['version'] is defined and nextcloud_config_vars['version'] | string | length > 0
+      - nextcloud_config_vars['instanceid'] is defined and nextcloud_config_vars['instanceid'] | string | length > 0
+      - nextcloud_config_vars['passwordsalt'] is defined and nextcloud_config_vars['passwordsalt'] | string | length > 0
+      - nextcloud_config_vars['secret'] is defined and nextcloud_config_vars['secret'] | string | length > 0
+
+      # --- Database Connection ---
+      - nextcloud_config_vars['dbtype'] is defined and nextcloud_config_vars['dbtype'] | string | length > 0
+      - nextcloud_config_vars['dbhost'] is defined and nextcloud_config_vars['dbhost'] | string | length > 0
+      - nextcloud_config_vars['dbname'] is defined and nextcloud_config_vars['dbname'] | string | length > 0
+      - nextcloud_config_vars['dbuser'] is defined and nextcloud_config_vars['dbuser'] | string | length > 0
+      - nextcloud_config_vars['dbpassword'] is defined and nextcloud_config_vars['dbpassword'] | string | length > 0
+
+      # --- File System Paths ---
+      - nextcloud_config_vars['datadirectory'] is defined and nextcloud_config_vars['datadirectory'] | string | length > 0
+
+      # --- Network & URL Overrides ---
+      - nextcloud_config_vars['overwrite.cli.url'] is defined and nextcloud_config_vars['overwrite.cli.url'] | string | length > 0
+      - nextcloud_config_vars['overwriteprotocol'] is defined and nextcloud_config_vars['overwriteprotocol'] | string | length > 0
+      - nextcloud_config_vars['overwritehost'] is defined and nextcloud_config_vars['overwritehost'] | string | length > 0
+      - nextcloud_config_vars['trusted_domains'] is defined and nextcloud_config_vars['trusted_domains'] | length > 0
+
+      # --- Mail Settings ---
+      - nextcloud_config_vars['mail_domain'] is defined and nextcloud_config_vars['mail_domain'] | string | length > 0
+      - nextcloud_config_vars['mail_from_address'] is defined and nextcloud_config_vars['mail_from_address'] | string | length > 0
+      - nextcloud_config_vars['mail_smtpmode'] is defined and nextcloud_config_vars['mail_smtpmode'] | string | length > 0
+      - nextcloud_config_vars['mail_smtphost'] is defined and nextcloud_config_vars['mail_smtphost'] | string | length > 0
+      - nextcloud_config_vars['mail_smtpport'] is defined and nextcloud_config_vars['mail_smtpport'] | string | length > 0
+      - nextcloud_config_vars['mail_smtppassword'] is defined and nextcloud_config_vars['mail_smtppassword'] | string | length > 0
+
+  # config
+  - name: Template config to {{ nextcloud_app_dir }}/config/config.php
+    become: true
+    ansible.builtin.template:
+      src: config.php.j2
+      dest: "{{ nextcloud_app_dir }}/config/config.php"
+      owner: "{{ nextcloud_linux_user }}"
+      group: "{{ nextcloud_linux_user }}"
+      mode: '0640'
