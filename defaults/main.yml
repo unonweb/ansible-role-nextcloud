@@ -2,7 +2,6 @@
 # INSTALL
 # =======
 nextcloud_linux_user: www-data
-nextcloud_install_opt_url: https://download.nextcloud.com/server/releases/latest.zip
 nextcloud_install_state: present
 
 # CONFIG

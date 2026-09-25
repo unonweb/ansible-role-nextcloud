@@ -7,6 +7,7 @@
     ansible.builtin.assert:
       that:
       - nextcloud_app_dir != None
+      - nextcloud_install_state != None
 
   # absent
   - when: nextcloud_install_state == "absent"
@@ -25,7 +26,6 @@
       ansible.builtin.assert:
         that:
         - nextcloud_linux_user != None
-        - nextcloud_install_opt_url != None
 
     # check required packages
     - name: Check required packages
@@ -58,7 +58,7 @@
     - name: Download the latest Nextcloud zip archive
       become: true
       ansible.builtin.get_url:
-        url: "{{ nextcloud_install_opt_url }}"
+        url: "{{ __nextcloud_install_opt_url }}"
         dest: /tmp/nextcloud-latest.zip
         mode: '0644'
 
