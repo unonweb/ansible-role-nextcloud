@@ -55,7 +55,7 @@
         mode: '0755'
 
     # download
-    - name: Download the latest Nextcloud zip archive
+    - name: Download archive from {{ __nextcloud_install_opt_url }}
       become: true
       ansible.builtin.get_url:
         url: "{{ __nextcloud_install_opt_url }}"
