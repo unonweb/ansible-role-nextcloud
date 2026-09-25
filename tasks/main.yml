@@ -16,10 +16,13 @@
       - nextcloud_linux_user != None
 
   # install
-  - ansible.builtin.import_tasks: install.yml
+  - ansible.builtin.import_tasks: nextcloud-install.yml
 
   # init
-  - ansible.builtin.import_tasks: init.yml
+  - ansible.builtin.import_tasks: nextcloud-init.yml
 
   # config
-  - ansible.builtin.import_tasks: config.yml
+  - ansible.builtin.import_tasks: nextcloud-config.yml
+
+  # systemd
+  - ansible.builtin.import_tasks: nextcloud-systemd.yml
