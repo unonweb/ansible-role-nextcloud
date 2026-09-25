@@ -1,5 +1,5 @@
 ---
-- tags: [nextcloud-init]
+- tags: [role-nextcloud-init]
   block:
     
   # check
