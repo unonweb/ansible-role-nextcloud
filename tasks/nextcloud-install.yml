@@ -1,7 +1,13 @@
 ---
 - tags: [role-nextcloud-install]
   block:
-    
+
+  # assert
+  - name: Assertions for nextcloud-install
+    ansible.builtin.assert:
+      that:
+      - nextcloud_app_dir != None
+
   # absent
   - when: nextcloud_install_state == "absent"
     name: Remove {{ nextcloud_app_dir }}
@@ -18,7 +24,6 @@
     - name: Assertions for nextcloud-install
       ansible.builtin.assert:
         that:
-        - nextcloud_app_dir != None
         - nextcloud_linux_user != None
         - nextcloud_install_opt_url != None
 
