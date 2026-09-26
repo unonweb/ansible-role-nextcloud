@@ -6,6 +6,9 @@
   # install
   - ansible.builtin.import_tasks: subtasks/nextcloud-install.yml
 
+  # systemd
+  - ansible.builtin.import_tasks: subtasks/nextcloud-systemd.yml
+
   # init
   - ansible.builtin.import_tasks: subtasks/nextcloud-init.yml
 
